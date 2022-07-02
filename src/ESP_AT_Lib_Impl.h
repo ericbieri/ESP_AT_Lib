@@ -494,6 +494,10 @@ bool ESP8266::connectToMqttBroker(String host, uint16_t port, uint8_t recon) {
   return sATMQTTCONN (host, port, recon);
 }
 
+bool ESP8266::publishMqttMsg(String topic, String data, uint8_t qos, bool retain) {
+  return sATMQTTPUB (topic, data, qos, retain);
+}
+
 /*----------------------------------------------------------------------------*/
 /* +IPD,<id>,<len>:<data> */
 /* +IPD,<len>:<data> */
@@ -2153,8 +2157,6 @@ uint32_t ESP8266::recvPkg(uint8_t *buffer, uint32_t buffer_size, uint32_t *data_
 // Set MQTT User Configuration
 bool ESP8266::sATMQTTUSERCFG (uint8_t scheme, String clientId, String user, String pwd)
 {  
-  String data;
-
   rx_empty();   
 
   m_puart->print(F("AT+MQTTUSERCFG=0,"));
@@ -2172,11 +2174,9 @@ bool ESP8266::sATMQTTUSERCFG (uint8_t scheme, String clientId, String user, Stri
   return recvFind("OK", 1000);
 }
 
-// Set MQTT User Configuration
+// Connect to MQTT broker
 bool ESP8266::sATMQTTCONN (String host, uint16_t port, uint8_t recon)
 {  
-  String data;
-
   rx_empty();   
 
   m_puart->print(F("AT+MQTTCONN=0,\""));
@@ -2191,5 +2191,22 @@ bool ESP8266::sATMQTTCONN (String host, uint16_t port, uint8_t recon)
   return recvFind("OK", 5000);
 }
 
+// Publish MQTT Message in a String
+bool ESP8266::sATMQTTPUB (String topic, String data, uint8_t qos, bool retain)
+{  
+  rx_empty();   
+
+  m_puart->print(F("AT+MQTTPUB=0,\""));
+  AT_LIB_LOGDEBUG(F("AT+MQTTPUB=0,\""));
+
+  m_puart->print(topic);
+  m_puart->print(F("\",\""));
+  m_puart->print(data);
+  m_puart->print(F("\","));
+  m_puart->print(qos);
+  m_puart->print(F(","));
+  m_puart->println(retain);
+
+  return recvFind("OK", 5000);
 
 #endif    // __ESP_AT_LIB_IMPL_H__

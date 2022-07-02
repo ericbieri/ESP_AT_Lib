@@ -673,6 +673,7 @@ class ESP8266
 
     bool setMqttUserConfiguration(uint8_t scheme, String clientId, String user, String pwd);
     bool connectToMqttBroker(String host, uint16_t port, uint8_t recon);
+    bool publishMqttMsg(String topic, String data, uint8_t qos, bool retain);
 
   private:
 
@@ -770,6 +771,7 @@ class ESP8266
     //////////// MQTT ////////////
     bool sATMQTTUSERCFG (uint8_t scheme, String clientId, String user, String pwd);
     bool sATMQTTCONN (String host, uint16_t port, uint8_t recon);
+    bool sATMQTTPUB (String topic, String data, uint8_t qos, bool retain);
 
     /*
        +IPD,len:data
