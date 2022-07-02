@@ -671,8 +671,8 @@ class ESP8266
     */
     bool sendFromFlash(uint8_t mux_id, const uint8_t *buffer, uint32_t len);
 
-
     bool setMqttUserConfiguration(uint8_t scheme, String clientId, String user, String pwd);
+    bool connectToMqttBroker(String host, uint16_t port, uint8_t recon);
 
   private:
 
@@ -767,7 +767,9 @@ class ESP8266
     bool eATPING(String ip);
     bool sATCIPSTO(uint32_t timeout);
 
+    //////////// MQTT ////////////
     bool sATMQTTUSERCFG (uint8_t scheme, String clientId, String user, String pwd);
+    bool sATMQTTCONN (String host, uint16_t port, uint8_t recon);
 
     /*
        +IPD,len:data

@@ -490,10 +490,9 @@ bool ESP8266::setMqttUserConfiguration(uint8_t scheme, String clientId, String u
   return sATMQTTUSERCFG(scheme, clientId, user, pwd);
 }
 
-
-
-
-
+bool ESP8266::connectToMqttBroker(String host, uint16_t port, uint8_t recon) {
+  return sATMQTTCONN (String host, uint16_t port, uint8_t recon);
+}
 
 /*----------------------------------------------------------------------------*/
 /* +IPD,<id>,<len>:<data> */
@@ -2170,30 +2169,31 @@ bool ESP8266::sATMQTTUSERCFG (uint8_t scheme, String clientId, String user, Stri
   m_puart->print(pwd);
   m_puart->println(F("\",0,0,\"\""));
 
-#if USE_ESP32_AT
-  data = recvString("OK", 5000);
-#else
-  data = recvString("OK", "ERROR", 5000);
-#endif
-
-  if (data.indexOf("OK") != -1) {
-    return true;
-  }
-  return false;
+  return recvFind("OK", 1000);
 }
 
-// // Sets the TCP Server Timeout
-// bool ESP8266::sATCIPSTO(uint32_t timeout)
-// {
-//   rx_empty();
-//   m_puart->print(F("AT+CIPSTO="));
+// Set MQTT User Configuration
+bool ESP8266::sATMQTTCONN (String host, uint16_t port, uint8_t recon)
+{  
+  String data;
 
-//   AT_LIB_LOGDEBUG(F("AT+CIPSTO="));
+  rx_empty();   
 
-//   m_puart->println(timeout);
+  m_puart->print(F("AT+MQTTCONN=0,"));
+  AT_LIB_LOGDEBUG(F("AT+MQTTCONN=\""));
 
-//   return recvFind("OK");
-// }
+  m_puart->print(host);
+  m_puart->print(F("\","));
+  m_puart->print(port);
+  m_puart->print(F(","));
+  m_puart->print(recon);
+  m_puart->print(F(",\""));
+  m_puart->println(pwd);
+
+  return recvFind("OK", 1000);
+}
+
 
 #endif    // __ESP_AT_LIB_IMPL_H__
 
+  Serial2.println("AT+MQTTCONN=0,\"192.168.1.16\",1883,1");
