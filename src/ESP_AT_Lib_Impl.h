@@ -2208,5 +2208,6 @@ bool ESP8266::sATMQTTPUB (String topic, String data, uint8_t qos, bool retain)
   m_puart->println(retain);
 
   return recvFind("OK", 5000);
+}
 
 #endif    // __ESP_AT_LIB_IMPL_H__
