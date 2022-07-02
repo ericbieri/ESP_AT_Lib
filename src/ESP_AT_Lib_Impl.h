@@ -2180,20 +2180,16 @@ bool ESP8266::sATMQTTCONN (String host, uint16_t port, uint8_t recon)
   rx_empty();   
 
   m_puart->print(F("AT+MQTTCONN=0,"));
-  AT_LIB_LOGDEBUG(F("AT+MQTTCONN=\""));
+  AT_LIB_LOGDEBUG(F("AT+MQTTCONN=0,\""));
 
   m_puart->print(host);
   m_puart->print(F("\","));
   m_puart->print(port);
   m_puart->print(F(","));
   m_puart->print(recon);
-  m_puart->print(F(",\""));
-  m_puart->println(pwd);
 
   return recvFind("OK", 1000);
 }
 
 
 #endif    // __ESP_AT_LIB_IMPL_H__
-
-  Serial2.println("AT+MQTTCONN=0,\"192.168.1.16\",1883,1");
