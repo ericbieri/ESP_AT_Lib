@@ -2186,7 +2186,7 @@ bool ESP8266::sATMQTTCONN (String host, uint16_t port, uint8_t recon)
   m_puart->print(F("\","));
   m_puart->print(port);
   m_puart->print(F(","));
-  m_puart->print(recon);
+  m_puart->println(recon);
 
   return recvFind("OK", 5000);
 }
