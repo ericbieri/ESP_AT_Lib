@@ -484,6 +484,17 @@ void ESP8266::run()
   rx_empty();
 }
 
+///////////////// MQTT ///////////////////
+
+bool ESP8266::setMqttUserConfiguration(uint8_t scheme, String clientId, String user, String pwd) {
+  return sATMQTTUSERCFG(scheme, clientId, user, pwd);
+}
+
+
+
+
+
+
 /*----------------------------------------------------------------------------*/
 /* +IPD,<id>,<len>:<data> */
 /* +IPD,<len>:<data> */
@@ -2137,7 +2148,52 @@ uint32_t ESP8266::recvPkg(uint8_t *buffer, uint32_t buffer_size, uint32_t *data_
   }
   return 0;
 }
-///////////////
+
+/////////////// MQTT /////////////// 
+
+// Set MQTT User Configuration
+bool ESP8266::sATMQTTUSERCFG (uint8_t scheme, String clientId, String user, String pwd)
+{  
+  String data;
+
+  rx_empty();   
+
+  m_puart->print(F("AT+MQTTUSERCFG=0,"));
+  AT_LIB_LOGDEBUG(F("AT+MQTTUSERCFG="));
+
+  m_puart->print(scheme);
+  m_puart->print(F(",\""));
+  m_puart->print(clientId);
+  m_puart->print(F("\",\""));
+  m_puart->print(user);
+  m_puart->print(F("\",\""));
+  m_puart->print(pwd);
+  m_puart->println(F("\""));
+
+#if USE_ESP32_AT
+  data = recvString("OK", 5000);
+#else
+  data = recvString("OK", "ERROR", 5000);
+#endif
+
+  if (data.indexOf("OK") != -1) {
+    return true;
+  }
+  return false;
+}
+
+// // Sets the TCP Server Timeout
+// bool ESP8266::sATCIPSTO(uint32_t timeout)
+// {
+//   rx_empty();
+//   m_puart->print(F("AT+CIPSTO="));
+
+//   AT_LIB_LOGDEBUG(F("AT+CIPSTO="));
+
+//   m_puart->println(timeout);
+
+//   return recvFind("OK");
+// }
 
 #endif    // __ESP_AT_LIB_IMPL_H__
 
