@@ -2171,7 +2171,7 @@ bool ESP8266::sATMQTTUSERCFG (uint8_t scheme, String clientId, String user, Stri
   m_puart->print(pwd);
   m_puart->println(F("\",0,0,\"\""));
 
-  return recvFind("OK", 1000);
+  return recvFind("OK", 5000);
 }
 
 // Connect to MQTT broker
