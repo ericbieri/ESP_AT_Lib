@@ -2168,7 +2168,7 @@ bool ESP8266::sATMQTTUSERCFG (uint8_t scheme, String clientId, String user, Stri
   m_puart->print(user);
   m_puart->print(F("\",\""));
   m_puart->print(pwd);
-  m_puart->println(F("\""));
+  m_puart->println(F("\",0,0,\"\""));
 
 #if USE_ESP32_AT
   data = recvString("OK", 5000);
