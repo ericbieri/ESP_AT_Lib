@@ -491,7 +491,7 @@ bool ESP8266::setMqttUserConfiguration(uint8_t scheme, String clientId, String u
 }
 
 bool ESP8266::connectToMqttBroker(String host, uint16_t port, uint8_t recon) {
-  return sATMQTTCONN (String host, uint16_t port, uint8_t recon);
+  return sATMQTTCONN (host, port, recon);
 }
 
 /*----------------------------------------------------------------------------*/
