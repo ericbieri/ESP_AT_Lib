@@ -2179,7 +2179,7 @@ bool ESP8266::sATMQTTCONN (String host, uint16_t port, uint8_t recon)
 
   rx_empty();   
 
-  m_puart->print(F("AT+MQTTCONN=0,"));
+  m_puart->print(F("AT+MQTTCONN=0,\""));
   AT_LIB_LOGDEBUG(F("AT+MQTTCONN=0,\""));
 
   m_puart->print(host);
@@ -2188,7 +2188,7 @@ bool ESP8266::sATMQTTCONN (String host, uint16_t port, uint8_t recon)
   m_puart->print(F(","));
   m_puart->print(recon);
 
-  return recvFind("OK", 1000);
+  return recvFind("OK", 5000);
 }
 
 
