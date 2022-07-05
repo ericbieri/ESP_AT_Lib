@@ -2172,27 +2172,27 @@ uint32_t ESP8266::recvPkg(uint8_t *buffer, uint32_t buffer_size, uint32_t *data_
   }
 
   // TODO: extract MQTT data
-  if (has_mqtt_data) 
-  {
-    len = sizeof(data);
-    i = 0;
-    ret = (uint32_t) len > buffer_size ? buffer_size : (uint32_t) len;
-    start = millis();
+  // if (has_mqtt_data) 
+  // {
+  //   len = sizeof(data);
+  //   i = 0;
+  //   ret = (uint32_t) len > buffer_size ? buffer_size : (uint32_t) len;
+  //   start = millis();
     
-    while (millis() - start < 3000) 
-    {
-      while (m_puart->available() > 0 && i < ret) 
-      {
-        a = m_puart->read();
-        buffer[i++] = a;
-      }
+  //   while (millis() - start < 3000) 
+  //   {
+  //     while (m_puart->available() > 0 && i < ret) 
+  //     {
+  //       a = m_puart->read();
+  //       buffer[i++] = a;
+  //     }
       
 
         
-        return ret;
-      }
-    }
-  }
+  //       return ret;
+  //     }
+  //   }
+  // }
   return 0;
 }
 
