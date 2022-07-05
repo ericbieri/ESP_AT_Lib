@@ -498,6 +498,13 @@ bool ESP8266::publishMqttMsg(String topic, String data, uint8_t qos, bool retain
   return sATMQTTPUB (topic, data, qos, retain);
 }
 
+bool ESP8266::subscribeToMqttTopic(String topic, uint8_t qos) {
+  return sATMQTTSUB(topic, qos);
+}
+
+bool ESP8266::closeMqttConnections() {
+  return sATMQTTCLEAN();
+}
 /*----------------------------------------------------------------------------*/
 /* +IPD,<id>,<len>:<data> */
 /* +IPD,<len>:<data> */
@@ -2049,14 +2056,19 @@ uint32_t ESP8266::recvPkg(uint8_t *buffer, uint32_t buffer_size, uint32_t *data_
   String data;
   char a;
   int32_t index_PIPDcomma = -1;
+  uint32_t index_MQTTSUBRECVcomma = -1;
+
   int32_t index_colon = -1; /* : */
   int32_t index_comma = -1; /* , */
   int32_t len = -1;
   int8_t id = -1;
   bool has_data = false;
+  bool has_mqtt_data = false;
   uint32_t ret;
   unsigned long start;
   uint32_t i;
+
+
 
   if (buffer == NULL)
   {
@@ -2115,6 +2127,15 @@ uint32_t ESP8266::recvPkg(uint8_t *buffer, uint32_t buffer_size, uint32_t *data_
         break;
       }
     }
+
+    // MQTT subcribtion data
+    index_MQTTSUBRECVcomma = data.indexOf("+MQTTSUBRECV:");
+    if(index_MQTTSUBRECVcomma != -1) {
+      Serial.println(data);
+      has_mqtt_data = true;
+      len = sizeof(data);
+    }
+
   }
 
   if (has_data) 
@@ -2149,13 +2170,36 @@ uint32_t ESP8266::recvPkg(uint8_t *buffer, uint32_t buffer_size, uint32_t *data_
       }
     }
   }
+
+  // TODO: extract MQTT data
+  if (has_mqtt_data) 
+  {
+    len = sizeof(data);
+    i = 0;
+    ret = (uint32_t) len > buffer_size ? buffer_size : (uint32_t) len;
+    start = millis();
+    
+    while (millis() - start < 3000) 
+    {
+      while (m_puart->available() > 0 && i < ret) 
+      {
+        a = m_puart->read();
+        buffer[i++] = a;
+      }
+      
+
+        
+        return ret;
+      }
+    }
+  }
   return 0;
 }
 
 /////////////// MQTT /////////////// 
 
 // Set MQTT User Configuration
-bool ESP8266::sATMQTTUSERCFG (uint8_t scheme, String clientId, String user, String pwd)
+bool ESP8266::sATMQTTUSERCFG(uint8_t scheme, String clientId, String user, String pwd)
 {  
   rx_empty();   
 
@@ -2175,7 +2219,7 @@ bool ESP8266::sATMQTTUSERCFG (uint8_t scheme, String clientId, String user, Stri
 }
 
 // Connect to MQTT broker
-bool ESP8266::sATMQTTCONN (String host, uint16_t port, uint8_t recon)
+bool ESP8266::sATMQTTCONN(String host, uint16_t port, uint8_t recon)
 {  
   rx_empty();   
 
@@ -2192,7 +2236,7 @@ bool ESP8266::sATMQTTCONN (String host, uint16_t port, uint8_t recon)
 }
 
 // Publish MQTT Message in a String
-bool ESP8266::sATMQTTPUB (String topic, String data, uint8_t qos, bool retain)
+bool ESP8266::sATMQTTPUB(String topic, String data, uint8_t qos, bool retain)
 {  
   rx_empty();   
 
@@ -2207,7 +2251,34 @@ bool ESP8266::sATMQTTPUB (String topic, String data, uint8_t qos, bool retain)
   m_puart->print(F(","));
   m_puart->println(retain);
 
-  return recvFind("OK", 10000);
+  return recvFind("OK", 5000);
 }
+
+// Subscribe to MQTT topic 
+bool ESP8266::sATMQTTSUB(String topic, uint8_t qos)
+{  
+  rx_empty();   
+
+  m_puart->print(F("AT+MQTTSUB=0,\""));
+  AT_LIB_LOGDEBUG(F("AT+MQTTSUB=0,\""));
+
+  m_puart->print(topic);
+  m_puart->print(F("\","));
+  m_puart->println(qos);
+
+  return recvFind("OK", 5000);
+}
+
+// Close MQTT connections
+bool ESP8266::sATMQTTCLEAN()
+{  
+  rx_empty();   
+
+  m_puart->print(F("AT+MQTTCLEAN=0"));
+  AT_LIB_LOGDEBUG(F("AT+MQTTCLEAN=0"));
+
+  return recvFind("OK", 5000);
+}
+
 
 #endif    // __ESP_AT_LIB_IMPL_H__
